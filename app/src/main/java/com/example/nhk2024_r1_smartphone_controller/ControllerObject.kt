@@ -1,22 +1,29 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 // TODO: Convert to JSON
 
 @Serializable
 data class ControllerObject(
-    @SerialName("v_x") private var vx: Int = 127,
-    @SerialName("v_y") private var vy: Int = 127,
-    @SerialName("omega") private var omega: Int = 127,
-    @SerialName("btn_a") private var btnA: Boolean = false,
-    @SerialName("btn_b") private var btnB: Boolean = false,
-    @SerialName("btn_x") private var btnX: Boolean = false,
-    @SerialName("btn_y") private var btnY: Boolean = false,
+    @SerialName("v_x") private var vx: Int,
+    @SerialName("v_y") private var vy: Int,
+    @SerialName("omega") private var omega: Int,
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_a") private var btnA: Boolean,
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_b") private var btnB: Boolean,
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_x") private var btnX: Boolean,
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_y") private var btnY: Boolean,
     // TODO: Check following properties
-    @SerialName("btn_lb") private var btnL1: Boolean = false,
-    @SerialName("btn_rb") private var btnR1: Boolean = false
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_lb") private var btnL1: Boolean,
+    @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_rb") private var btnR1: Boolean
 ) {
 
     fun setRobotXYVelocity(
@@ -82,5 +89,24 @@ data class ControllerObject(
         } else {
             value
         }
+    }
+}
+
+@Serializer(forClass = Boolean::class)
+object BooleanAsIntSerializer: KSerializer<Boolean> {
+    override val descriptor = PrimitiveSerialDescriptor("BooleanASInt", PrimitiveKind.INT)
+
+    override fun serialize(encoder: Encoder, value: Boolean) {
+        encoder.encodeInt(
+            if (value) {
+                1
+            } else {
+                0
+            }
+        )
+    }
+
+    override fun deserialize(decoder: Decoder): Boolean {
+        return decoder.decodeInt() != 0
     }
 }

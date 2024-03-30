@@ -3,21 +3,37 @@ package com.example.nhk2024_r1_smartphone_controller
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MotionEvent
-import android.view.InputDevice
-import android.util.Log
 import android.view.KeyEvent
-import android.widget.EditText
-import android.widget.TextView
+import kotlinx.serialization.json.Json
+import kotlin.concurrent.thread
+
 
 class MainActivity : AppCompatActivity() {
-    // TODO: Add GameControllerStateClass
     private lateinit var controllerObject: ControllerObject
+    private lateinit var hostName: String
+    private val port = 12345
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        this.controllerObject = ControllerObject()
+        this.controllerObject = ControllerObject(
+            vx = 127,
+            vy = 127,
+            omega = 127,
+            btnA = false,
+            btnB = false,
+            btnX = false,
+            btnY = false,
+            btnL1 = false,
+            btnR1 = false
+        )
+        this.hostName = "192.168.10.106"
+        thread {
+            for (i in 0..10) {
+                RaspiRepository().sendControllerData(hostName, port, this.controllerObject)
+            }
+        }
     }
 
     // For analog input
@@ -34,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         this.controllerObject.setAngularVelocity(axisZ)
 
         // TODO: Send data to Raspberrypi
+        RaspiRepository().sendControllerData(hostName, port, this.controllerObject)
 
         return super.onGenericMotionEvent(event)
     }
@@ -64,6 +81,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // TODO: Send data to Raspberrypi
+        RaspiRepository().sendControllerData(hostName, port, this.controllerObject)
 
         return super.onKeyDown(keyCode, event)
     }
@@ -94,6 +112,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // TODO: Send data to Raspberrypi
+        RaspiRepository().sendControllerData(hostName, port, this.controllerObject)
 
         return super.onKeyUp(keyCode, event)
     }
