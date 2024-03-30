@@ -9,7 +9,6 @@ import android.view.KeyEvent
 import android.widget.EditText
 import android.widget.TextView
 
-
 class MainActivity : AppCompatActivity() {
     // TODO: Add GameControllerStateClass
     private lateinit var controllerObject: ControllerObject

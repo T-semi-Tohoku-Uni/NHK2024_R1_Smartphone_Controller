@@ -1,29 +1,23 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 // TODO: Convert to JSON
 
-class ControllerObject {
-    private var vx: Int
-    private var vy: Int
-    private var omega: Int
-    private var btnA: Boolean
-    private var btnB: Boolean
-    private var btnX: Boolean
-    private var btnY: Boolean
-    private var btnL1: Boolean
-    private var btnR1: Boolean
-
-    constructor() {
-        this.vx = 127      // 0
-        this.vy = 127      // 0
-        this.omega = 127   // 0
-        this.btnA = false  // Release State
-        this.btnB = false  // Release State
-        this.btnX = false  // Release State
-        this.btnY = false  // Release State
-        this.btnL1 = false // Release State
-        this.btnR1 = false // Release State
-    }
+@Serializable
+data class ControllerObject(
+    @SerialName("v_x") private var vx: Int = 127,
+    @SerialName("v_y") private var vy: Int = 127,
+    @SerialName("omega") private var omega: Int = 127,
+    @SerialName("btn_a") private var btnA: Boolean = false,
+    @SerialName("btn_b") private var btnB: Boolean = false,
+    @SerialName("btn_x") private var btnX: Boolean = false,
+    @SerialName("btn_y") private var btnY: Boolean = false,
+    // TODO: Check following properties
+    @SerialName("btn_lb") private var btnL1: Boolean = false,
+    @SerialName("btn_rb") private var btnR1: Boolean = false
+) {
 
     fun setRobotXYVelocity(
         coordinateX: Float,
