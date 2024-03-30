@@ -1,10 +1,11 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
-import android.view.KeyEvent
+import android.view.*
+import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,14 +40,24 @@ class MainActivity : AppCompatActivity() {
             btnL1 = false,
             btnR1 = false
         )
+
+        // Set raspberrypi IP address
         this.hostName = "192.168.10.106"
 
-//        // For debug
-//        val button = findViewById<Button>(R.id.button)
-//        button.setOnClickListener {
-//            Log.d("UDP_SEND", "ボタンがクリックされました。UDPパケットを送信します。")
-//            RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
-//        }
+        // Set full screen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11 (API 30) 以降の場合
+            window.insetsController?.let {
+                it.hide(WindowInsets.Type.navigationBars() or WindowInsets.Type.statusBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            // 古いバージョンのAndroidの場合は、非推奨のメソッドを使用
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        }
     }
 
     // For analog input
