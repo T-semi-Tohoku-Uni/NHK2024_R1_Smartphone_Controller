@@ -47,6 +47,12 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 return true
             }
+            KeyEvent.KEYCODE_BUTTON_L1 -> {
+                return true
+            }
+            KeyEvent.KEYCODE_BUTTON_L2 -> {
+                return true
+            }
         }
 
         return super.onKeyDown(keyCode, event)
@@ -67,6 +73,12 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
+                return true
+            }
+            KeyEvent.KEYCODE_BUTTON_L1 -> {
+                return true
+            }
+            KeyEvent.KEYCODE_BUTTON_R1 -> {
                 return true
             }
         }
