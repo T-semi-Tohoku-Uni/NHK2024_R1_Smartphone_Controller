@@ -1,23 +1,63 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.InputDevice
 import android.util.Log
-import android.view.KeyEvent
-import android.widget.EditText
-import android.widget.TextView
+import android.view.*
+import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+import android.widget.Button
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import kotlin.concurrent.thread
+
 
 class MainActivity : AppCompatActivity() {
-    // TODO: Add GameControllerStateClass
     private lateinit var controllerObject: ControllerObject
+    private lateinit var hostName: String
+    private val port = 12345
+    private val socket = DatagramSocket()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        this.controllerObject = ControllerObject()
+        // Initialize controllerObject
+        this.controllerObject = ControllerObject(
+            vx = 127,
+            vy = 127,
+            omega = 127,
+            btnA = false,
+            btnB = false,
+            btnX = false,
+            btnY = false,
+            btnL1 = false,
+            btnR1 = false
+        )
+
+        // Set raspberrypi IP address
+        this.hostName = "192.168.10.106"
+
+        // Set full screen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11 (API 30) 以降の場合
+            window.insetsController?.let {
+                it.hide(WindowInsets.Type.navigationBars() or WindowInsets.Type.statusBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            // 古いバージョンのAndroidの場合は、非推奨のメソッドを使用
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        }
     }
 
     // For analog input
@@ -27,13 +67,12 @@ class MainActivity : AppCompatActivity() {
         val axisX = event.getAxisValue(MotionEvent.AXIS_X)   // left stick horizontal
         val axisY = event.getAxisValue(MotionEvent.AXIS_Y)   // left stick vertical
         val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
-
         // val axisRZ = event.getAxisValue(MotionEvent.AXIS_RZ) // right stick vertical
 
         this.controllerObject.setRobotXYVelocity(axisX, axisY)
         this.controllerObject.setAngularVelocity(axisZ)
 
-        // TODO: Send data to Raspberrypi
+        RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
 
         return super.onGenericMotionEvent(event)
     }
@@ -45,25 +84,35 @@ class MainActivity : AppCompatActivity() {
         when (keyCode) {
             KeyEvent.KEYCODE_BUTTON_A -> {
                 this.controllerObject.setButtonA(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_B -> {
                 this.controllerObject.setButtonB(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_X -> {
                 this.controllerObject.setButtonX(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 this.controllerObject.setButtonY(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_L1 -> {
                 this.controllerObject.setButtonL1(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
-            KeyEvent.KEYCODE_BUTTON_L2 -> {
+            KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(true)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
         }
-
-        // TODO: Send data to Raspberrypi
 
         return super.onKeyDown(keyCode, event)
     }
@@ -75,25 +124,35 @@ class MainActivity : AppCompatActivity() {
         when (keyCode) {
             KeyEvent.KEYCODE_BUTTON_A -> {
                 this.controllerObject.setButtonA(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_B -> {
                 this.controllerObject.setButtonB(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_X -> {
                 this.controllerObject.setButtonX(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 this.controllerObject.setButtonY(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_L1 -> {
                 this.controllerObject.setButtonL1(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(false)
+                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                return true
             }
         }
-
-        // TODO: Send data to Raspberrypi
 
         return super.onKeyUp(keyCode, event)
     }
