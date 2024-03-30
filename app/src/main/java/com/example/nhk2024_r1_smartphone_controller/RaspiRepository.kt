@@ -15,7 +15,6 @@ import java.net.UnknownHostException
 class RaspiRepository(){
     // TODO: implement Check Connection and send PING for 1 sec until press disconnect button
 
-    // TODO: implement sendControllerData
     fun sendControllerData(hostName: String, port: Int, socket: DatagramSocket, ctrData: ControllerObject): Boolean {
         try {
             Log.d("RaspiRepository", "sendControllerData")
@@ -25,16 +24,15 @@ class RaspiRepository(){
                 socket.send(packet)
             }.start()
         } catch (e: UnknownHostException) {
-            print("UnknownHostException")
+            // TODO: Error Handling
             return false
         } catch (e: SocketException) {
-            print("SocketException")
+            // TODO: Error Handling
             return false
         } catch (e: IOException) {
-            print("IOException")
+            // TODO: Error Handling
             return false
         }
-        print("mceowjfoiewj")
         return true
     }
 
