@@ -182,4 +182,9 @@ class MainActivity : AppCompatActivity() {
 
         return super.onKeyUp(keyCode, event)
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.pingThread?.interrupt()
+    }
 }

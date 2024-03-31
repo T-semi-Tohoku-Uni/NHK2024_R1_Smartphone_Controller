@@ -13,7 +13,7 @@ import java.net.SocketException
 import java.net.UnknownHostException
 
 class RaspiRepository(){
-    
+
     fun startConnection(hostName: String): Thread {
         return Thread {
             try {
