@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var hostName: String
     private val port = 12345
     private val socket = DatagramSocket()
+    private lateinit var  pingThread: Thread
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +44,15 @@ class MainActivity : AppCompatActivity() {
 
         // Set raspberrypi IP address
         this.hostName = "192.168.10.106"
+
+        // Set ping thread
+        this.pingThread = RaspiRepository().startConnection(this.hostName)
+
+        // For debug
+        val button = findViewById<Button>(R.id.button)
+        button.setOnClickListener {
+            this.pingThread.start()
+        }
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

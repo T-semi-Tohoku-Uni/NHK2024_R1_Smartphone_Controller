@@ -13,7 +13,28 @@ import java.net.SocketException
 import java.net.UnknownHostException
 
 class RaspiRepository(){
-    // TODO: implement Check Connection and send PING for 1 sec until press disconnect button
+    fun startConnection(hostName: String): Thread {
+        return Thread {
+            try {
+                val runtime = Runtime.getRuntime()
+                while (!Thread.currentThread().isInterrupted) {
+                    val process = runtime.exec("ping -c 1 $hostName")
+                    process.inputStream.bufferedReader().useLines { lines ->
+                        lines.forEach { line ->
+                            Log.d("Ping", line)
+                        }
+                    }
+                    process.waitFor()
+                    Thread.sleep(1000)
+                }
+            } catch (e: InterruptedException) {
+                Log.d("Ping", "Ping thread was interrupted.")
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
 
     fun sendControllerData(hostName: String, port: Int, socket: DatagramSocket, ctrData: ControllerObject): Boolean {
         try {
