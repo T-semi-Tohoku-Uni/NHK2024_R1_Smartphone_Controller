@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
+import android.widget.ScrollView
+import android.widget.TextView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -30,8 +32,8 @@ class MainActivity : AppCompatActivity() {
     // Initialize at onCreate
     private lateinit var controllerObject: ControllerObject
     private lateinit var hostName: String
-
-
+    private lateinit var pingCommandLine: TextView
+    private lateinit var pingCommandScrollView: ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +58,10 @@ class MainActivity : AppCompatActivity() {
         // For debug
         setUpPingButton()
 
+        // Set command Line
+        this.pingCommandLine = findViewById<TextView>(R.id.text_view_output)
+        this.pingCommandScrollView = findViewById<ScrollView>(R.id.ping_command_line)
+
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Android 11 (API 30) 以降の場合
@@ -76,8 +82,8 @@ class MainActivity : AppCompatActivity() {
     private fun setUpPingButton() {
         val pingButton = findViewById<Button>(R.id.button)
         pingButton.setOnClickListener {
-            if (isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
-                this.pingThread = RaspiRepository().startConnection(this.hostName)
+            if (this.isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
+                this.pingThread = RaspiRepository().startConnection(this.hostName, ::updateCommandLineTextView)
                 this.pingThread?.start()
             } else { // (Current State) UnSend Ping => (Next State) Sending Ping
                 this.pingThread?.interrupt()
@@ -186,5 +192,16 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         this.pingThread?.interrupt()
+    }
+
+    // For display command output
+    private fun updateCommandLineTextView(line: String) {
+        runOnUiThread {
+            this.pingCommandLine.append("$line\n")
+
+            this.pingCommandScrollView.post {
+                this.pingCommandScrollView.fullScroll(ScrollView.FOCUS_DOWN)
+            }
+        }
     }
 }

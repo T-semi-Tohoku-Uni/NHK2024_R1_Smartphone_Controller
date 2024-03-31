@@ -1,10 +1,13 @@
 package com.example.nhk2024_r1_smartphone_controller
 
 import android.util.Log
+import android.widget.TextView
+import androidx.annotation.UiThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.w3c.dom.Text
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -14,7 +17,7 @@ import java.net.UnknownHostException
 
 class RaspiRepository(){
 
-    fun startConnection(hostName: String): Thread {
+    fun startConnection(hostName: String, updateCommandLineTextView: (String) -> Unit): Thread {
         return Thread {
             try {
                 val runtime = Runtime.getRuntime()
@@ -23,6 +26,7 @@ class RaspiRepository(){
                     process.inputStream.bufferedReader().useLines { lines ->
                         lines.forEach { line ->
                             Log.d("Ping", line)
+                            updateCommandLineTextView(line + "\n")
                         }
                     }
                     process.waitFor()
