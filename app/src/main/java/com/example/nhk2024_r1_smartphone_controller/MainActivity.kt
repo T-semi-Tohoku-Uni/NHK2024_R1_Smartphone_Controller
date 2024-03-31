@@ -7,6 +7,8 @@ import android.util.Log
 import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
+import android.widget.ScrollView
+import android.widget.TextView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -19,10 +21,19 @@ import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var controllerObject: ControllerObject
-    private lateinit var hostName: String
+    // const
     private val port = 12345
     private val socket = DatagramSocket()
+
+    // Save context
+    private var isPinging: Boolean = false
+    private var pingThread: Thread? = null
+
+    // Initialize at onCreate
+    private lateinit var controllerObject: ControllerObject
+    private lateinit var hostName: String
+    private lateinit var pingCommandLine: TextView
+    private lateinit var pingCommandScrollView: ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +55,13 @@ class MainActivity : AppCompatActivity() {
         // Set raspberrypi IP address
         this.hostName = "192.168.10.106"
 
+        // For debug
+        setUpPingButton()
+
+        // Set command Line
+        this.pingCommandLine = findViewById<TextView>(R.id.text_view_output)
+        this.pingCommandScrollView = findViewById<ScrollView>(R.id.ping_command_line)
+
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Android 11 (API 30) 以降の場合
@@ -57,6 +75,20 @@ class MainActivity : AppCompatActivity() {
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        }
+    }
+
+    // Setup Ping Button
+    private fun setUpPingButton() {
+        val pingButton = findViewById<Button>(R.id.button)
+        pingButton.setOnClickListener {
+            if (this.isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
+                this.pingThread = RaspiRepository().startConnection(this.hostName, ::updateCommandLineTextView)
+                this.pingThread?.start()
+            } else { // (Current State) UnSend Ping => (Next State) Sending Ping
+                this.pingThread?.interrupt()
+            }
+            this.isPinging = !this.isPinging
         }
     }
 
@@ -155,5 +187,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         return super.onKeyUp(keyCode, event)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        this.pingThread?.interrupt()
+    }
+
+    // For display command output
+    private fun updateCommandLineTextView(line: String) {
+        runOnUiThread {
+            val currentText = this.pingCommandLine.text.toString()
+            val currentLines = currentText.split("\n").toMutableList()
+
+            currentLines.add(line)
+
+            while (currentLines.size > 100) {
+                currentLines.removeAt(0)
+            }
+
+            this.pingCommandLine.text = currentLines.joinToString("\n")
+
+            this.pingCommandScrollView.post {
+                this.pingCommandScrollView.fullScroll(ScrollView.FOCUS_DOWN)
+            }
+        }
     }
 }
