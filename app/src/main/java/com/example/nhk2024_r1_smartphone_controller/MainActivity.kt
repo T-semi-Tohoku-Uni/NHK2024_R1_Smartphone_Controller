@@ -19,11 +19,19 @@ import kotlin.concurrent.thread
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var controllerObject: ControllerObject
-    private lateinit var hostName: String
+    // const
     private val port = 12345
     private val socket = DatagramSocket()
-    private lateinit var  pingThread: Thread
+
+    // Save context
+    private var isPinging: Boolean = false
+    private var pingThread: Thread? = null
+
+    // Initialize at onCreate
+    private lateinit var controllerObject: ControllerObject
+    private lateinit var hostName: String
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +53,8 @@ class MainActivity : AppCompatActivity() {
         // Set raspberrypi IP address
         this.hostName = "192.168.10.106"
 
-        // Set ping thread
-        this.pingThread = RaspiRepository().startConnection(this.hostName)
-
         // For debug
-        val button = findViewById<Button>(R.id.button)
-        button.setOnClickListener {
-            this.pingThread.start()
-        }
+        setUpPingButton()
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -67,6 +69,20 @@ class MainActivity : AppCompatActivity() {
             window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                     or View.SYSTEM_UI_FLAG_FULLSCREEN
                     or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
+        }
+    }
+
+    // Setup Ping Button
+    private fun setUpPingButton() {
+        val pingButton = findViewById<Button>(R.id.button)
+        pingButton.setOnClickListener {
+            if (isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
+                this.pingThread = RaspiRepository().startConnection(this.hostName)
+                this.pingThread?.start()
+            } else { // (Current State) UnSend Ping => (Next State) Sending Ping
+                this.pingThread?.interrupt()
+            }
+            this.isPinging = !this.isPinging
         }
     }
 
