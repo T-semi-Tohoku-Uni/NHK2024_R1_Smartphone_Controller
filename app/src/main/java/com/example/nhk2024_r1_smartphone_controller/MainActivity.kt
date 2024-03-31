@@ -197,7 +197,16 @@ class MainActivity : AppCompatActivity() {
     // For display command output
     private fun updateCommandLineTextView(line: String) {
         runOnUiThread {
-            this.pingCommandLine.append("$line\n")
+            val currentText = this.pingCommandLine.text.toString()
+            val currentLines = currentText.split("\n").toMutableList()
+
+            currentLines.add(line)
+
+            while (currentLines.size > 100) {
+                currentLines.removeAt(0)
+            }
+
+            this.pingCommandLine.text = currentLines.joinToString("\n")
 
             this.pingCommandScrollView.post {
                 this.pingCommandScrollView.fullScroll(ScrollView.FOCUS_DOWN)
