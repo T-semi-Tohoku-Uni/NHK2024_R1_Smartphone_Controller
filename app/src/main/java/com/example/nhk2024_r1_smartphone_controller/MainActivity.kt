@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     // Save context
     private var isPinging: Boolean = false
     private var pingThread: Thread? = null
+    private val raspiRepository = RaspiRepository()
 
     // Initialize at onCreate
     private lateinit var controllerObject: ControllerObject
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         // Set raspberrypi IP address
-        this.hostName = "192.168.10.106"
+        this.hostName = "192.168.10.110"
 
         // For debug
         setUpPingButton()
@@ -61,6 +62,8 @@ class MainActivity : AppCompatActivity() {
         // Set command Line
         this.pingCommandLine = findViewById<TextView>(R.id.text_view_output)
         this.pingCommandScrollView = findViewById<ScrollView>(R.id.ping_command_line)
+
+        this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.socket)
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -82,13 +85,17 @@ class MainActivity : AppCompatActivity() {
     private fun setUpPingButton() {
         val pingButton = findViewById<Button>(R.id.button)
         pingButton.setOnClickListener {
-            if (this.isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
-                this.pingThread = RaspiRepository().startConnection(this.hostName, ::updateCommandLineTextView)
-                this.pingThread?.start()
-            } else { // (Current State) UnSend Ping => (Next State) Sending Ping
-                this.pingThread?.interrupt()
+//            if (this.isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
+//                this.pingThread = RaspiRepository().startConnection(this.hostName, ::updateCommandLineTextView)
+//                this.pingThread?.start()
+//            } else { // (Current State) UnSend Ping => (Next State) Sending Ping
+//                this.pingThread?.interrupt()
+//            }
+//            this.isPinging = !this.isPinging
+
+            for (i in 0..100) {
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
             }
-            this.isPinging = !this.isPinging
         }
     }
 
@@ -104,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         this.controllerObject.setRobotXYVelocity(axisX, axisY)
         this.controllerObject.setAngularVelocity(axisZ)
 
-        RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+        this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
 
         return super.onGenericMotionEvent(event)
     }
@@ -116,32 +123,32 @@ class MainActivity : AppCompatActivity() {
         when (keyCode) {
             KeyEvent.KEYCODE_BUTTON_A -> {
                 this.controllerObject.setButtonA(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_B -> {
                 this.controllerObject.setButtonB(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_X -> {
                 this.controllerObject.setButtonX(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 this.controllerObject.setButtonY(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_L1 -> {
                 this.controllerObject.setButtonL1(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(true)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
         }
@@ -156,32 +163,32 @@ class MainActivity : AppCompatActivity() {
         when (keyCode) {
             KeyEvent.KEYCODE_BUTTON_A -> {
                 this.controllerObject.setButtonA(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_B -> {
                 this.controllerObject.setButtonB(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_X -> {
                 this.controllerObject.setButtonX(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 this.controllerObject.setButtonY(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_L1 -> {
                 this.controllerObject.setButtonL1(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(false)
-                RaspiRepository().sendControllerData(this.hostName, this.port, this.socket, this.controllerObject)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 return true
             }
         }
