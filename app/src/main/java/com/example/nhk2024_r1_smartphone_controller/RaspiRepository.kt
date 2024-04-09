@@ -18,38 +18,18 @@ import java.net.UnknownHostException
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class RaspiRepository(){
-
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
     private val queue = ConcurrentLinkedQueue<ControllerObject>()
-
-    fun startConnection(hostName: String, updateCommandLineTextView: (String) -> Unit): Thread {
-        return Thread {
-            try {
-                val runtime = Runtime.getRuntime()
-                while (!Thread.currentThread().isInterrupted) {
-                    val process = runtime.exec("ping -c 1 $hostName")
-                    process.inputStream.bufferedReader().useLines { lines ->
-                        lines.forEach { line ->
-                            Log.d("Ping", line)
-                            updateCommandLineTextView(line + "\n")
-                        }
-                    }
-                    process.waitFor()
-                    Thread.sleep(1000)
-                }
-            } catch (e: InterruptedException) {
-                Log.d("Ping", "Ping thread was interrupted.")
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
+    private val queue_for_wheel = ConcurrentLinkedQueue<WheelObject>()
 
     fun addToRaspiUDPQueue(ctrData: ControllerObject) {
         queue.add(ctrData)
     }
 
-    fun startRaspiUDP(hostName: String, port: Int, socket: DatagramSocket) {
+    fun sendWheelDataToRaspi(wheelData: WheelObject) {
+        queue_for_wheel.add(wheelData)
+    }
+
+    fun startRaspiUDP(hostName: String, port: Int, port_for_wheel_control: Int, socket: DatagramSocket) {
         val address = InetAddress.getByName(hostName)
         CoroutineScope(Dispatchers.IO).launch {
             socket.use { socket ->
@@ -59,6 +39,22 @@ class RaspiRepository(){
 
                         val message = Json.encodeToString(ControllerObject.serializer(), ctrData).toByteArray()
                         val packet = DatagramPacket(message, message.size, address, port)
+
+                        socket.send(packet)
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        CoroutineScope(Dispatchers.IO).launch {
+            socket.use { socket ->
+                try {
+                    while (isActive) {
+                        val wheelData = queue_for_wheel.poll() ?: continue
+
+                        val message = Json.encodeToString(WheelObject.serializer(), wheelData).toByteArray()
+                        val packet = DatagramPacket(message, message.size, address, port_for_wheel_control)
 
                         socket.send(packet)
                     }

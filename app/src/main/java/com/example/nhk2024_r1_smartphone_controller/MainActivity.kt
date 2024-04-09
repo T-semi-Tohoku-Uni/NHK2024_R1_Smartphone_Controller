@@ -8,12 +8,14 @@ import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
 import android.widget.ScrollView
+import android.widget.SeekBar
 import android.widget.TextView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import org.w3c.dom.Text
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -23,6 +25,7 @@ import kotlin.concurrent.thread
 class MainActivity : AppCompatActivity() {
     // const
     private val port = 12345
+    private val prot_for_wheel_controle = 12346
     private val socket = DatagramSocket()
 
     // Save context
@@ -32,9 +35,11 @@ class MainActivity : AppCompatActivity() {
 
     // Initialize at onCreate
     private lateinit var controllerObject: ControllerObject
+    private lateinit var wheelObject: WheelObject
     private lateinit var hostName: String
     private lateinit var pingCommandLine: TextView
     private lateinit var pingCommandScrollView: ScrollView
+    private lateinit var shootSetPointValue: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,20 +55,48 @@ class MainActivity : AppCompatActivity() {
             btnX = false,
             btnY = false,
             btnL1 = false,
-            btnR1 = false
+            btnR1 = false,
+            seedlingHandPos = SeedlingHandPos.PICKUP,
+            areaState = AreaState.SEEDLING,
+//            shootSetpoint = 250,
+        )
+
+        this.wheelObject = WheelObject(
+            vx = 127,
+            vy = 127,
+            omega = 127
         )
 
         // Set raspberrypi IP address
-        this.hostName = "192.168.10.110"
-
-        // For debug
-        setUpPingButton()
+        this.hostName = "192.168.0.18"
 
         // Set command Line
-        this.pingCommandLine = findViewById<TextView>(R.id.text_view_output)
-        this.pingCommandScrollView = findViewById<ScrollView>(R.id.ping_command_line)
 
-        this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.socket)
+        this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.prot_for_wheel_controle, this.socket)
+
+        // Set SeekBar Handler
+        val shootSetPointSeekBar = findViewById<SeekBar>(R.id.shoot_setpoint)
+        this.shootSetPointValue = findViewById<TextView>(R.id.roller_rotation_speed)
+        shootSetPointSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                // ここに進行状況が変わった時の処理を記述
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                // ここにタッチが開始された時の処理を記述
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                // ここに手が離れた時の処理を記述
+                seekBar?.progress?.let {
+//                    // ここで取得したprogressを使用する
+//                    val rotation_speed_setpoint = it * 5
+//                    this@MainActivity.controllerObject.setShootSetPoint(rotation_speed_setpoint)
+//                    this@MainActivity.shootSetPointValue.text = rotation_speed_setpoint.toString()
+//                    this@MainActivity.raspiRepository.addToRaspiUDPQueue(this@MainActivity.controllerObject)
+                }
+            }
+        })
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -81,37 +114,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Setup Ping Button
-    private fun setUpPingButton() {
-        val pingButton = findViewById<Button>(R.id.button)
-        pingButton.setOnClickListener {
-//            if (this.isPinging) { // (Current State) Sending Ping => (Next State) UnSend Ping
-//                this.pingThread = RaspiRepository().startConnection(this.hostName, ::updateCommandLineTextView)
-//                this.pingThread?.start()
-//            } else { // (Current State) UnSend Ping => (Next State) Sending Ping
-//                this.pingThread?.interrupt()
-//            }
-//            this.isPinging = !this.isPinging
-
-            for (i in 0..100) {
-                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-            }
-        }
-    }
-
     // For analog input
     override fun onGenericMotionEvent(event: MotionEvent): Boolean {
-        // TODO: Check InputDevice (SOURCE_GAMEPAD, SOURCE_GAMEPAD)
+        if (event.source and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
+            event.source and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) {
+            val axisX = event.getAxisValue(MotionEvent.AXIS_X)   // left stick horizontal
+            val axisY = event.getAxisValue(MotionEvent.AXIS_Y)   // left stick vertical
+            val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
+            // val axisRZ = event.getAxisValue(MotionEvent.AXIS_RZ) // right stick vertical
 
-        val axisX = event.getAxisValue(MotionEvent.AXIS_X)   // left stick horizontal
-        val axisY = event.getAxisValue(MotionEvent.AXIS_Y)   // left stick vertical
-        val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
-        // val axisRZ = event.getAxisValue(MotionEvent.AXIS_RZ) // right stick vertical
+//            this.controllerObject.setRobotXYVelocity(axisX, axisY)
+//            this.controllerObject.setAngularVelocity(axisZ)
 
-        this.controllerObject.setRobotXYVelocity(axisX, axisY)
-        this.controllerObject.setAngularVelocity(axisZ)
+            this.wheelObject.setRobotXYVelocity(axisX, axisY)
+            this.wheelObject.setAngularVelocity(axisZ)
 
-        this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+            this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
+
+            return true
+        }
 
         return super.onGenericMotionEvent(event)
     }
@@ -149,6 +170,25 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                return true
+            }
+
+            // 十時キー
+
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                // TODO
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                // TODO
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT -> {
+                // TODO
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                // TODO
                 return true
             }
         }
@@ -189,6 +229,19 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(false)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                return true
+            }
+
+            KeyEvent.KEYCODE_DPAD_UP -> {
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_DOWN -> {
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> {
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT -> {
                 return true
             }
         }
