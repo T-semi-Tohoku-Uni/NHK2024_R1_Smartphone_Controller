@@ -41,6 +41,14 @@ data class WheelObject(
             value
         }
     }
+
+    fun setVelocity(
+        v_x: Int,
+        v_y: Int
+    ) {
+        this.vx = v_x
+        this.vy = v_y
+    }
 }
 
 @Serializable
@@ -108,6 +116,18 @@ data class ControllerObject(
         isPushed: Boolean
     ) {
         this.btnR1 = isPushed
+    }
+
+    fun setAreaState(
+        area: AreaState
+    ) {
+        this.areaState = area
+    }
+
+    fun setSeedlingHandPos(
+        pos: SeedlingHandPos
+    ) {
+        this.seedlingHandPos = pos
     }
 //
 //    fun setShootSetPoint(

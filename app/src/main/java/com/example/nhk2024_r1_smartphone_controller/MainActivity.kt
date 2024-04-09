@@ -67,6 +67,10 @@ class MainActivity : AppCompatActivity() {
             omega = 127
         )
 
+        this.wheelObject.setRobotXYVelocity(0.5.toFloat(), 0.5.toFloat())
+
+        Log.d("Hello", this.wheelObject.toString())
+
         // Set raspberrypi IP address
         this.hostName = "192.168.0.18"
 
@@ -74,29 +78,62 @@ class MainActivity : AppCompatActivity() {
 
         this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.prot_for_wheel_controle, this.socket)
 
+
+        val seedlingButton = findViewById<Button>(R.id.seedling)
+        val ballButton = findViewById<Button>(R.id.ball)
+
+        seedlingButton.setOnClickListener {
+            this.controllerObject.setAreaState(AreaState.SEEDLING)
+            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+
+        ballButton.setOnClickListener {
+            this.controllerObject.setAreaState(AreaState.BALL)
+            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+
+        // TODO: refactor
+        val pickup = findViewById<Button>(R.id.pickup)
+        val putInside = findViewById<Button>(R.id.put_inside)
+        val putOutside = findViewById<Button>(R.id.put_outside)
+
+        pickup.setOnClickListener {
+            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+        putInside.setOnClickListener {
+            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
+            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+        putOutside.setOnClickListener {
+            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
+            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+
+
         // Set SeekBar Handler
-        val shootSetPointSeekBar = findViewById<SeekBar>(R.id.shoot_setpoint)
-        this.shootSetPointValue = findViewById<TextView>(R.id.roller_rotation_speed)
-        shootSetPointSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                // ここに進行状況が変わった時の処理を記述
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                // ここにタッチが開始された時の処理を記述
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                // ここに手が離れた時の処理を記述
-                seekBar?.progress?.let {
-//                    // ここで取得したprogressを使用する
-//                    val rotation_speed_setpoint = it * 5
-//                    this@MainActivity.controllerObject.setShootSetPoint(rotation_speed_setpoint)
-//                    this@MainActivity.shootSetPointValue.text = rotation_speed_setpoint.toString()
-//                    this@MainActivity.raspiRepository.addToRaspiUDPQueue(this@MainActivity.controllerObject)
-                }
-            }
-        })
+//        val shootSetPointSeekBar = findViewById<SeekBar>(R.id.shoot_setpoint)
+//        this.shootSetPointValue = findViewById<TextView>(R.id.roller_rotation_speed)
+//        shootSetPointSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//                // ここに進行状況が変わった時の処理を記述
+//            }
+//
+//            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//                // ここにタッチが開始された時の処理を記述
+//            }
+//
+//            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//                // ここに手が離れた時の処理を記述
+//                seekBar?.progress?.let {
+////                    // ここで取得したprogressを使用する
+////                    val rotation_speed_setpoint = it * 5
+////                    this@MainActivity.controllerObject.setShootSetPoint(rotation_speed_setpoint)
+////                    this@MainActivity.shootSetPointValue.text = rotation_speed_setpoint.toString()
+////                    this@MainActivity.raspiRepository.addToRaspiUDPQueue(this@MainActivity.controllerObject)
+//                }
+//            }
+//        })
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -116,8 +153,34 @@ class MainActivity : AppCompatActivity() {
 
     // For analog input
     override fun onGenericMotionEvent(event: MotionEvent): Boolean {
-        if (event.source and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
-            event.source and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK) {
+        if ((event.source and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
+            val dpadX = event.getAxisValue(MotionEvent.AXIS_HAT_X)
+            // 十字キーの上下の入力を取得（上は負、下は正）
+            val dpadY = event.getAxisValue(MotionEvent.AXIS_HAT_Y)
+
+            if (dpadX != 0f) {
+                if (dpadX > 0) {
+                    this.wheelObject.setRobotXYVelocity(0.4.toFloat(), 0.0.toFloat())
+                } else {
+                    this.wheelObject.setRobotXYVelocity(-(0.4.toFloat()), 0.0.toFloat())
+                }
+                this.wheelObject.setAngularVelocity(0.0.toFloat())
+
+                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
+                return true
+            } else if (dpadY != 0f) {
+                if (dpadY > 0) {
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.4.toFloat()))
+                } else {
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.4.toFloat())
+                }
+
+                this.wheelObject.setAngularVelocity(0.0.toFloat())
+
+                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
+                return true
+            }
+
             val axisX = event.getAxisValue(MotionEvent.AXIS_X)   // left stick horizontal
             val axisY = event.getAxisValue(MotionEvent.AXIS_Y)   // left stick vertical
             val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
@@ -177,18 +240,26 @@ class MainActivity : AppCompatActivity() {
 
             KeyEvent.KEYCODE_DPAD_UP -> {
                 // TODO
+//                this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.6.toFloat())
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_DOWN -> {
                 // TODO
+//                this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.6.toFloat()))
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_LEFT -> {
                 // TODO
+//                this.wheelObject.setRobotXYVelocity(-(0.6.toFloat()), 0.0.toFloat())
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
                 // TODO
+//                this.wheelObject.setRobotXYVelocity(0.6.toFloat(), 0.0.toFloat())
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
         }
@@ -233,15 +304,23 @@ class MainActivity : AppCompatActivity() {
             }
 
             KeyEvent.KEYCODE_DPAD_UP -> {
+//                this.wheelObject.setVelocity(0, 0)
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_DOWN -> {
+//                this.wheelObject.setVelocity(0, 100)
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_RIGHT -> {
+//                this.wheelObject.setVelocity(150, 0)
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
             KeyEvent.KEYCODE_DPAD_LEFT -> {
+//                this.wheelObject.setVelocity(100, 0)
+//                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
         }
