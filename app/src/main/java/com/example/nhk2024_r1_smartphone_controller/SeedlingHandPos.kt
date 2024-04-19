@@ -11,8 +11,9 @@ import kotlinx.serialization.encoding.Encoder
 @Serializable
 enum class SeedlingHandPos {
     PICKUP, // => 0
-    PUTINSIDE, // => 1
-    PUTOUTSIDE; // => 2
+    PUTOUTSIDE, // => 1
+    PUTINSIDE;// => 2
+
 
     companion object {
         fun fromOrdinal(ordinal: Int): SeedlingHandPos = values().getOrElse(ordinal) { PICKUP }

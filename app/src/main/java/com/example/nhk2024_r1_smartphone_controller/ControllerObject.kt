@@ -23,7 +23,7 @@ data class WheelObject(
         coordinateY: Float
     ) {
         this.vx = ((this.validateJoyConOutput(coordinateX) + 1) * (255 / 2)).toInt()
-        this.vy = ((this.validateJoyConOutput(coordinateY) + 1) * (255 / 2)).toInt()
+        this.vy = ((this.validateJoyConOutput(-coordinateY) + 1) * (255 / 2)).toInt()
     }
 
     fun setAngularVelocity(
@@ -37,25 +37,16 @@ data class WheelObject(
     ): Float {
         return if (-0.3 < value && value < 0.3) {
             0f
+        } else if (value > 0) {
+            value - 0.3f
         } else {
-            value
+            value + 0.3f
         }
-    }
-
-    fun setVelocity(
-        v_x: Int,
-        v_y: Int
-    ) {
-        this.vx = v_x
-        this.vy = v_y
     }
 }
 
 @Serializable
 data class ControllerObject(
-    @SerialName("v_x") private var vx: Int,
-    @SerialName("v_y") private var vy: Int,
-    @SerialName("omega") private var omega: Int,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_a") private var btnA: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_b") private var btnB: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_x") private var btnX: Boolean,
@@ -67,21 +58,6 @@ data class ControllerObject(
     @Serializable(with = AreaStateSerializer::class) @SerialName("area_state") private var areaState: AreaState
 //    @SerialName("shoot_setpoint") private var shootSetpoint: Int,
 ) {
-
-    fun setRobotXYVelocity(
-        coordinateX: Float,
-        coordinateY: Float
-    ) {
-        this.vx = ((this.validateJoyConOutput(coordinateX) + 1) * (255 / 2)).toInt()
-        this.vy = ((this.validateJoyConOutput(coordinateY) + 1) * (255 / 2)).toInt()
-    }
-
-    fun setAngularVelocity(
-        coordinateOmega: Float
-    ) {
-        this.omega = ((this.validateJoyConOutput(coordinateOmega) + 1) * (255 / 2)).toInt()
-    }
-
     fun setButtonA(
         isPushed: Boolean
     ) {
@@ -141,15 +117,6 @@ data class ControllerObject(
         use this function when get joy-con analog value
         wrap between -0.3 and 0.3 to 0
      */
-    private fun validateJoyConOutput(
-        value: Float
-    ): Float {
-        return if (-0.3 < value && value < 0.3) {
-            0f
-        } else {
-            value
-        }
-    }
 }
 
 @Serializer(forClass = Boolean::class)

@@ -47,9 +47,6 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize controllerObject
         this.controllerObject = ControllerObject(
-            vx = 127,
-            vy = 127,
-            omega = 127,
             btnA = false,
             btnB = false,
             btnX = false,
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Hello", this.wheelObject.toString())
 
         // Set raspberrypi IP address
-        this.hostName = "192.168.0.18"
+        this.hostName = "192.168.11.100"
 
         // Set command Line
 
@@ -160,9 +157,9 @@ class MainActivity : AppCompatActivity() {
 
             if (dpadX != 0f) {
                 if (dpadX > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.4.toFloat(), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.7.toFloat(), 0.0.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(-(0.4.toFloat()), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(-(0.7.toFloat()), 0.0.toFloat())
                 }
                 this.wheelObject.setAngularVelocity(0.0.toFloat())
 
@@ -170,9 +167,9 @@ class MainActivity : AppCompatActivity() {
                 return true
             } else if (dpadY != 0f) {
                 if (dpadY > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.4.toFloat()))
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.7.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.4.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.7.toFloat()))
                 }
 
                 this.wheelObject.setAngularVelocity(0.0.toFloat())
@@ -197,7 +194,7 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
-        return super.onGenericMotionEvent(event)
+        return true
     }
 
     // For button press
@@ -264,7 +261,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        return super.onKeyDown(keyCode, event)
+        return true
     }
 
     // For button release
@@ -325,7 +322,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        return super.onKeyUp(keyCode, event)
+        return true
     }
 
     override fun onDestroy() {
