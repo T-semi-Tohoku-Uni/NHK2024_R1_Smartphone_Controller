@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -77,8 +78,8 @@ class MainActivity : AppCompatActivity() {
         this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.prot_for_wheel_controle, this.socket)
 
 
-        val seedlingButton = findViewById<Button>(R.id.seedling)
-        val ballButton = findViewById<Button>(R.id.ball)
+        val seedlingButton = findViewById<ImageButton>(R.id.seedling)
+        val ballButton = findViewById<ImageButton>(R.id.ball)
 
         seedlingButton.setOnClickListener {
             this.controllerObject.setAreaState(AreaState.SEEDLING)
