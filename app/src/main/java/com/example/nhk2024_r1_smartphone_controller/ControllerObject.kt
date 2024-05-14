@@ -16,32 +16,47 @@ import kotlinx.serialization.encoding.Encoder
 data class WheelObject(
     @SerialName("v_x") private var vx: Int,
     @SerialName("v_y") private var vy: Int,
-    @SerialName("omega") private var omega: Int
+    @SerialName("omega") private var omega: Int,
+    @Transient private var isSpeedUp: Boolean,
+    @Transient private var xyScaler: Float = 0.5f,
+    @Transient private var omegaScaler: Float = 0.2f
 ) {
     fun setRobotXYVelocity(
         coordinateX: Float,
-        coordinateY: Float
+        coordinateY: Float,
     ) {
-        this.vx = ((this.validateJoyConOutput(coordinateX) + 1) * (255 / 2)).toInt()
-        this.vy = ((this.validateJoyConOutput(-coordinateY) + 1) * (255 / 2)).toInt()
+        this.vx = ((this.validateJoyConOutput(coordinateX, this.xyScaler) + 1) * (255 / 2)).toInt()
+        this.vy = ((this.validateJoyConOutput(-coordinateY, this.xyScaler) + 1) * (255 / 2)).toInt()
     }
 
     fun setAngularVelocity(
-        coordinateOmega: Float
+        coordinateOmega: Float,
     ) {
-        this.omega = ((this.validateJoyConOutput(coordinateOmega) + 1) * (255 / 2)).toInt()
+        this.omega = ((this.validateJoyConOutput(coordinateOmega, this.omegaScaler) + 1) * (255 / 2)).toInt()
     }
 
     private fun validateJoyConOutput(
-        value: Float
+        value: Float,
+        scaler: Float,
     ): Float {
+        var wheelScaler = scaler
+
+        // scale up speed
+        if (isSpeedUp) {
+            wheelScaler = 1.0f
+        }
+
         return if (-0.3 < value && value < 0.3) {
             0f
         } else if (value > 0) {
-            value - 0.3f
+            wheelScaler * (value - 0.3f)
         } else {
-            value + 0.3f
+            wheelScaler * (value + 0.3f)
         }
+    }
+
+    fun setIsSpeedUP(isPushed: Boolean) {
+        this.isSpeedUp = isPushed
     }
 }
 

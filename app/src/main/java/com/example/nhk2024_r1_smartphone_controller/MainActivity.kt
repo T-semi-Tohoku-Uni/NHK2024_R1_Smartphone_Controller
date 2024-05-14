@@ -61,7 +61,8 @@ class MainActivity : AppCompatActivity() {
         this.wheelObject = WheelObject(
             vx = 127,
             vy = 127,
-            omega = 127
+            omega = 127,
+            isSpeedUp = false
         )
 
         this.wheelObject.setRobotXYVelocity(0.5.toFloat(), 0.5.toFloat())
@@ -155,24 +156,27 @@ class MainActivity : AppCompatActivity() {
             // 十字キーの上下の入力を取得（上は負、下は正）
             val dpadY = event.getAxisValue(MotionEvent.AXIS_HAT_Y)
 
+            val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
+            this.wheelObject.setAngularVelocity(axisZ)
+
             if (dpadX != 0f) {
                 if (dpadX > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.7.toFloat(), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.6.toFloat(), 0.0.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(-(0.7.toFloat()), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(-(0.6.toFloat()), 0.0.toFloat())
                 }
-                this.wheelObject.setAngularVelocity(0.0.toFloat())
+//                this.wheelObject.setAngularVelocity(0.0.toFloat())
 
                 this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             } else if (dpadY != 0f) {
                 if (dpadY > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.7.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.6.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.7.toFloat()))
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.6.toFloat()))
                 }
 
-                this.wheelObject.setAngularVelocity(0.0.toFloat())
+//                this.wheelObject.setAngularVelocity(0.0.toFloat())
 
                 this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
@@ -180,14 +184,14 @@ class MainActivity : AppCompatActivity() {
 
             val axisX = event.getAxisValue(MotionEvent.AXIS_X)   // left stick horizontal
             val axisY = event.getAxisValue(MotionEvent.AXIS_Y)   // left stick vertical
-            val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
+//            val axisZ = event.getAxisValue(MotionEvent.AXIS_Z)   // right stick horizontal
             // val axisRZ = event.getAxisValue(MotionEvent.AXIS_RZ) // right stick vertical
 
 //            this.controllerObject.setRobotXYVelocity(axisX, axisY)
 //            this.controllerObject.setAngularVelocity(axisZ)
 
             this.wheelObject.setRobotXYVelocity(axisX, axisY)
-            this.wheelObject.setAngularVelocity(axisZ)
+//            this.wheelObject.setAngularVelocity(axisZ)
 
             this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
 
@@ -230,6 +234,12 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                return true
+            }
+
+            KeyEvent.KEYCODE_BUTTON_R2 -> { // For speed up
+                this.wheelObject.setIsSpeedUP(true)
+                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
 
@@ -297,6 +307,12 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(false)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                return true
+            }
+
+            KeyEvent.KEYCODE_BUTTON_R2 -> { // For speed up
+                this.wheelObject.setIsSpeedUP(false)
+                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
 
