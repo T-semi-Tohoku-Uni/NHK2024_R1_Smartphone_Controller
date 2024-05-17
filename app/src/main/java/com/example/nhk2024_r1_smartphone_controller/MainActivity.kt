@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -77,37 +78,102 @@ class MainActivity : AppCompatActivity() {
         this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.prot_for_wheel_controle, this.socket)
 
 
-        val seedlingButton = findViewById<Button>(R.id.seedling)
-        val ballButton = findViewById<Button>(R.id.ball)
+        val seedlingButton = findViewById<ImageButton>(R.id.seedling)
+        val ballButton = findViewById<ImageButton>(R.id.ball)
 
         seedlingButton.setOnClickListener {
             this.controllerObject.setAreaState(AreaState.SEEDLING)
             this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
         }
+        seedlingButton.setOnTouchListener {v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // ボタンが押されたとき
+                    seedlingButton.setImageResource(R.drawable.seedling_ball_pushed)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // ボタンが離されたとき
+                    seedlingButton.setImageResource(R.drawable.seedling_ball)
+                }
+            }
+            true
+        }
+
 
         ballButton.setOnClickListener {
             this.controllerObject.setAreaState(AreaState.BALL)
             this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
         }
+        ballButton.setOnTouchListener {v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // ボタンが押されたとき
+                    ballButton.setImageResource(R.drawable.ball_button_pushed)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // ボタンが離されたとき
+                    ballButton.setImageResource(R.drawable.ball_button)
+                }
+            }
+            true
+        }
 
         // TODO: refactor
-        val pickup = findViewById<Button>(R.id.pickup)
-        val putInside = findViewById<Button>(R.id.put_inside)
-        val putOutside = findViewById<Button>(R.id.put_outside)
+        val pickup = findViewById<ImageButton>(R.id.pickup)
+        val putInside = findViewById<ImageButton>(R.id.put_inside)
+        val putOutside = findViewById<ImageButton>(R.id.put_outside)
 
         pickup.setOnClickListener {
             this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
             this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
         }
+        pickup.setOnTouchListener {v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // ボタンが押されたとき
+                    pickup.setImageResource(R.drawable.arm_pickup_pushed)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // ボタンが離されたとき
+                    pickup.setImageResource(R.drawable.arm_pickup)
+                }
+            }
+            true
+        }
         putInside.setOnClickListener {
             this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
             this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        }
+        putInside.setOnTouchListener {v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // ボタンが押されたとき
+                    putInside.setImageResource(R.drawable.arm_inside_pushed)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // ボタンが離されたとき
+                    putInside.setImageResource(R.drawable.arm_inside)
+                }
+            }
+            true
         }
         putOutside.setOnClickListener {
             this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
             this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
         }
-
+        putOutside.setOnTouchListener {v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // ボタンが押されたとき
+                    putOutside.setImageResource(R.drawable.arm_outside_pushed)
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // ボタンが離されたとき
+                    putOutside.setImageResource(R.drawable.arm_outside)
+                }
+            }
+            true
+        }
 
         // Set SeekBar Handler
 //        val shootSetPointSeekBar = findViewById<SeekBar>(R.id.shoot_setpoint)
