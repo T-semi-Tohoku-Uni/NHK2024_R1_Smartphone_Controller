@@ -5,17 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/background"
-        tools:layout_editor_absoluteX="107dp"
-        tools:layout_editor_absoluteY="-48dp" />
+        android:src="@drawable/background"/>
 
     <ImageButton
         android:id="@+id/seedling"
-        android:layout_width="240dp"
+        android:layout_width="164dp"
         android:layout_height="wrap_content"
         android:src="@drawable/seedling_ball"
         android:adjustViewBounds="true"
@@ -25,13 +23,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.2"
-        app:layout_constraintVertical_bias="0.36"
+        app:layout_constraintHorizontal_bias="0.15"
+        app:layout_constraintVertical_bias="0.361"
         />
 
     <ImageButton
         android:id="@+id/ball"
-        android:layout_width="240dp"
+        android:layout_width="164dp"
         android:layout_height="wrap_content"
         android:src="@drawable/ball_button"
         android:adjustViewBounds="true"
@@ -41,37 +39,80 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.47"
-        app:layout_constraintVertical_bias="0.36"/>
+        app:layout_constraintHorizontal_bias="0.465"
+        app:layout_constraintVertical_bias="0.361"/>
 
-
-    <Button
+    <ImageButton
         android:id="@+id/pickup"
-        android:layout_width="0dp"
+        android:layout_width="163dp"
         android:layout_height="wrap_content"
-        android:text="PICKUP"
+        android:src="@drawable/arm_pickup"
+        android:adjustViewBounds="true"
+        android:padding="0dp"
+        android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/put_inside"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <Button
-        android:id="@+id/put_inside"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="PUTINSIDE"
-        app:layout_constraintStart_toEndOf="@+id/pickup"
-        app:layout_constraintEnd_toStartOf="@+id/put_outside"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_chainStyle="spread" />
-
-    <Button
-        android:id="@+id/put_outside"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="PUTOUTSIDE"
-        app:layout_constraintStart_toEndOf="@+id/put_inside"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.035"
+        app:layout_constraintVertical_bias="0.715"/>
+
+    <ImageButton
+        android:id="@+id/put_inside"
+        android:layout_width="163dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arm_inside"
+        android:adjustViewBounds="true"
+        android:padding="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.31"
+        app:layout_constraintVertical_bias="0.715"/>
+
+    <ImageButton
+        android:id="@+id/put_outside"
+        android:layout_width="164dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/arm_outside"
+        android:adjustViewBounds="true"
+        android:padding="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.58"
+        app:layout_constraintVertical_bias="0.715"/>
+<!--    <Button-->
+<!--        android:id="@+id/pickup"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="PICKUP"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/put_inside"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/put_inside"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="PUTINSIDE"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/pickup"-->
+<!--        app:layout_constraintEnd_toStartOf="@+id/put_outside"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintHorizontal_chainStyle="spread" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/put_outside"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="PUTOUTSIDE"-->
+<!--        app:layout_constraintStart_toEndOf="@+id/put_inside"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
 
 <!--    <ScrollView-->
 <!--        android:id="@+id/ping_command_line"-->
