@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Hello", this.wheelObject.toString())
 
         // Set raspberrypi IP address
-        this.hostName = "192.168.11.100"
+        this.hostName = "192.168.11.4"
 
         // Set command Line
 
@@ -81,15 +81,17 @@ class MainActivity : AppCompatActivity() {
         val seedlingButton = findViewById<ImageButton>(R.id.seedling)
         val ballButton = findViewById<ImageButton>(R.id.ball)
 
-        seedlingButton.setOnClickListener {
-            this.controllerObject.setAreaState(AreaState.SEEDLING)
-            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-        }
+//        seedlingButton.setOnClickListener {
+//            this.controllerObject.setAreaState(AreaState.SEEDLING)
+//            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//        }
         seedlingButton.setOnTouchListener {v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     seedlingButton.setImageResource(R.drawable.seedling_ball_pushed)
+                    this.controllerObject.setAreaState(AreaState.SEEDLING)
+                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -100,15 +102,17 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        ballButton.setOnClickListener {
-            this.controllerObject.setAreaState(AreaState.BALL)
-            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-        }
+//        ballButton.setOnClickListener {
+//            this.controllerObject.setAreaState(AreaState.BALL)
+//            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//        }
         ballButton.setOnTouchListener {v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     ballButton.setImageResource(R.drawable.ball_button_pushed)
+                    this.controllerObject.setAreaState(AreaState.BALL)
+                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -123,15 +127,17 @@ class MainActivity : AppCompatActivity() {
         val putInside = findViewById<ImageButton>(R.id.put_inside)
         val putOutside = findViewById<ImageButton>(R.id.put_outside)
 
-        pickup.setOnClickListener {
-            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
-            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-        }
+//        pickup.setOnClickListener {
+//            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+//            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//        }
         pickup.setOnTouchListener {v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     pickup.setImageResource(R.drawable.arm_pickup_pushed)
+                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -140,15 +146,17 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-        putInside.setOnClickListener {
-            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
-            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-        }
+//        putInside.setOnClickListener {
+//            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
+//            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//        }
         putInside.setOnTouchListener {v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     putInside.setImageResource(R.drawable.arm_inside_pushed)
+                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
+                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -157,15 +165,17 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-        putOutside.setOnClickListener {
-            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
-            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-        }
+//        putOutside.setOnClickListener {
+//            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
+//            this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//        }
         putOutside.setOnTouchListener {v, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     putOutside.setImageResource(R.drawable.arm_outside_pushed)
+                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
+                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
