@@ -86,97 +86,34 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.58"
         app:layout_constraintVertical_bias="0.715"/>
-<!--    <Button-->
-<!--        android:id="@+id/pickup"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="PICKUP"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/put_inside"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
 
-<!--    <Button-->
-<!--        android:id="@+id/put_inside"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="PUTINSIDE"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/pickup"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/put_outside"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintHorizontal_chainStyle="spread" />-->
+    <TextView
+        android:id="@+id/timer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:textSize="30dp"
+        android:textAlignment="center"
+        android:background="@color/black"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.63"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintWidth_percent="0.1"
+        app:layout_constraintHeight_percent="0.10"/>
 
-<!--    <Button-->
-<!--        android:id="@+id/put_outside"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="PUTOUTSIDE"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/put_inside"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent" />-->
-
-<!--    <ScrollView-->
-<!--        android:id="@+id/ping_command_line"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:fillViewport="true"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHeight_percent="0.5"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintWidth_percent="0.5">-->
-
-<!--        <TextView-->
-<!--            android:id="@+id/text_view_output"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:background="@color/black"-->
-<!--            android:fontFamily="monospace"-->
-<!--            android:padding="10sp"-->
-<!--            android:text="1 packets transmitted, 1 received, 0% packet loss, time 0ms\n"-->
-<!--            android:textColor="@color/white"-->
-<!--            android:textSize="8sp" />-->
-<!--    </ScrollView>-->
-
-<!--    <Button-->
-<!--        android:id="@+id/button"-->
-<!--        android:layout_width="10dp"-->
-<!--        android:layout_height="10dp"-->
-<!--        android:text="Button"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/roller_rotation_speed_text"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:text="ローラー回転数"-->
-<!--        android:textSize="20dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/shoot_setpoint"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/shoot_setpoint"-->
-<!--        />-->
-<!--    <TextView-->
-<!--        android:id="@+id/roller_rotation_speed"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textColor="@color/black"-->
-<!--        android:textSize="20dp"-->
-<!--        android:text="0"-->
-<!--        android:layout_marginLeft="10dp"-->
-<!--        app:layout_constraintStart_toEndOf="@+id/roller_rotation_speed_text"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/roller_rotation_speed_text"/>-->
-
-
-<!--    <SeekBar-->
-<!--        android:id="@+id/shoot_setpoint"-->
-<!--        android:thumb="@mipmap/ic_launcher"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginStart="30dp"-->
-<!--        app:layout_constraintTop_toTopOf="parent"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintWidth_percent="0.4"/>-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/debug_console"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.32"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
