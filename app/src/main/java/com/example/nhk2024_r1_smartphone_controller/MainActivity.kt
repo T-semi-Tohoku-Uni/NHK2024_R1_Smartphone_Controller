@@ -3,14 +3,19 @@ package com.example.nhk2024_r1_smartphone_controller
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+import android.widget.Adapter
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -41,10 +46,23 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pingCommandLine: TextView
     private lateinit var pingCommandScrollView: ScrollView
     private lateinit var shootSetPointValue: TextView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: RecyclerAdapter
+
+    private lateinit var timerTextView: TextView
+    private val handler = Handler(Looper.getMainLooper())
+    private var seconds = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // set debug console
+        val consoleText = mutableListOf<String>()
+        recyclerView = findViewById(R.id.debug_console)
+        this.adapter = RecyclerAdapter(consoleText, recyclerView)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Initialize controllerObject
         this.controllerObject = ControllerObject(
@@ -77,9 +95,13 @@ class MainActivity : AppCompatActivity() {
 
         this.raspiRepository.startRaspiUDP(this.hostName, this.port, this.prot_for_wheel_controle, this.socket)
 
+//        adapter.addItemToDebugConsole("hogehoge");
 
         val seedlingButton = findViewById<ImageButton>(R.id.seedling)
         val ballButton = findViewById<ImageButton>(R.id.ball)
+
+        this.timerTextView = findViewById<TextView>(R.id.timer)
+        startTimer()
 
 //        seedlingButton.setOnClickListener {
 //            this.controllerObject.setAreaState(AreaState.SEEDLING)
@@ -92,6 +114,8 @@ class MainActivity : AppCompatActivity() {
                     seedlingButton.setImageResource(R.drawable.seedling_ball_pushed)
                     this.controllerObject.setAreaState(AreaState.SEEDLING)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.adapter.addItemToDebugConsole("set AreaStaete to SEEDLING")
+                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -113,6 +137,8 @@ class MainActivity : AppCompatActivity() {
                     ballButton.setImageResource(R.drawable.ball_button_pushed)
                     this.controllerObject.setAreaState(AreaState.BALL)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.adapter.addItemToDebugConsole("set AreaState to BALL")
+                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -135,9 +161,14 @@ class MainActivity : AppCompatActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
+                    // TODO: add button
+                    handler.removeCallbacksAndMessages(null)
+                    startTimer()
                     pickup.setImageResource(R.drawable.arm_pickup_pushed)
                     this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PICKUP")
+                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -157,6 +188,8 @@ class MainActivity : AppCompatActivity() {
                     putInside.setImageResource(R.drawable.arm_inside_pushed)
                     this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTINSIDE")
+                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -176,6 +209,8 @@ class MainActivity : AppCompatActivity() {
                     putOutside.setImageResource(R.drawable.arm_outside_pushed)
                     this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTOUTSIDE")
+                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // ボタンが離されたとき
@@ -184,30 +219,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-        // Set SeekBar Handler
-//        val shootSetPointSeekBar = findViewById<SeekBar>(R.id.shoot_setpoint)
-//        this.shootSetPointValue = findViewById<TextView>(R.id.roller_rotation_speed)
-//        shootSetPointSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
-//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                // ここに進行状況が変わった時の処理を記述
-//            }
-//
-//            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-//                // ここにタッチが開始された時の処理を記述
-//            }
-//
-//            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-//                // ここに手が離れた時の処理を記述
-//                seekBar?.progress?.let {
-////                    // ここで取得したprogressを使用する
-////                    val rotation_speed_setpoint = it * 5
-////                    this@MainActivity.controllerObject.setShootSetPoint(rotation_speed_setpoint)
-////                    this@MainActivity.shootSetPointValue.text = rotation_speed_setpoint.toString()
-////                    this@MainActivity.raspiRepository.addToRaspiUDPQueue(this@MainActivity.controllerObject)
-//                }
-//            }
-//        })
 
         // Set full screen
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -420,6 +431,18 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         this.pingThread?.interrupt()
+        handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun startTimer() {
+        seconds = 0
+        handler.post(object : Runnable {
+            override fun run() {
+                seconds++
+                timerTextView.text = seconds.toString()
+                handler.postDelayed(this, 1000)
+            }
+        })
     }
 
     // For display command output
