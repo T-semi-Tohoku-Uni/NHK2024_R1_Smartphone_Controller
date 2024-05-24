@@ -12,7 +12,8 @@ import kotlinx.serialization.encoding.Encoder
 enum class SeedlingHandPos {
     PICKUP, // => 0
     PUTOUTSIDE, // => 1
-    PUTINSIDE;// => 2
+    PUTINSIDE,// => 2
+    RESET; // => 3
 
 
     companion object {

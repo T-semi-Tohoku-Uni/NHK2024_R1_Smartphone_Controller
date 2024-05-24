@@ -18,8 +18,8 @@ data class WheelObject(
     @SerialName("v_y") private var vy: Int,
     @SerialName("omega") private var omega: Int,
     @Transient private var isSpeedUp: Boolean,
-    @Transient private var xyScaler: Float = 0.5f,
-    @Transient private var omegaScaler: Float = 0.2f
+    @Transient private var xyScaler: Float = 0.7f,
+    @Transient private var omegaScaler: Float = 0.7f
 ) {
     fun setRobotXYVelocity(
         coordinateX: Float,
@@ -49,9 +49,9 @@ data class WheelObject(
         return if (-0.3 < value && value < 0.3) {
             0f
         } else if (value > 0) {
-            wheelScaler * (value - 0.3f)
+            wheelScaler * (value - 0.3f) / 0.7f
         } else {
-            wheelScaler * (value + 0.3f)
+            wheelScaler * (value + 0.3f) / 0.7f
         }
     }
 
@@ -66,11 +66,10 @@ data class ControllerObject(
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_b") private var btnB: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_x") private var btnX: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_y") private var btnY: Boolean,
-    // TODO: Check following properties
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_lb") private var btnL1: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_rb") private var btnR1: Boolean,
     @Serializable(with = SeedlingHandPosSerializer::class) @SerialName("seedling_hand_pos") private var seedlingHandPos: SeedlingHandPos,
-    @Serializable(with = AreaStateSerializer::class) @SerialName("area_state") private var areaState: AreaState
+    @Serializable(with = AreaStateSerializer::class) @SerialName("area_state") private var areaState: AreaState,
 //    @SerialName("shoot_setpoint") private var shootSetpoint: Int,
 ) {
     fun setButtonA(
@@ -120,12 +119,10 @@ data class ControllerObject(
     ) {
         this.seedlingHandPos = pos
     }
-//
-//    fun setShootSetPoint(
-//        setpoint: Int
-//    ) {
-//        this.shootSetpoint = setpoint
-//    }
+
+    fun getSeedlingHandPos(): SeedlingHandPos {
+        return this.seedlingHandPos
+    }
 
     /*
         Control safe area function
