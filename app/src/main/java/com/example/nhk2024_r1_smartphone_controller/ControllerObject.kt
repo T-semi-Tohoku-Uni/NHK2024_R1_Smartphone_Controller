@@ -1,5 +1,7 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import android.os.Parcel
+import android.os.Parcelable
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,21 +20,23 @@ data class WheelObject(
     @SerialName("v_y") private var vy: Int,
     @SerialName("omega") private var omega: Int,
     @Transient private var isSpeedUp: Boolean,
-    @Transient private var xyScaler: Float = 0.7f,
-    @Transient private var omegaScaler: Float = 0.7f
+//    @Transient private var xyScaler: Float = 0.6f,
+//    @Transient private var omegaScaler: Float = 0.6f,
 ) {
     fun setRobotXYVelocity(
         coordinateX: Float,
         coordinateY: Float,
+        xyScaler: Float = 0.6f,
     ) {
-        this.vx = ((this.validateJoyConOutput(coordinateX, this.xyScaler) + 1) * (255 / 2)).toInt()
-        this.vy = ((this.validateJoyConOutput(-coordinateY, this.xyScaler) + 1) * (255 / 2)).toInt()
+        this.vx = ((this.validateJoyConOutput(coordinateX, xyScaler) + 1) * (255 / 2)).toInt()
+        this.vy = ((this.validateJoyConOutput(-coordinateY, xyScaler) + 1) * (255 / 2)).toInt()
     }
 
     fun setAngularVelocity(
         coordinateOmega: Float,
+        omegaScaler: Float = 0.6f,
     ) {
-        this.omega = ((this.validateJoyConOutput(coordinateOmega, this.omegaScaler) + 1) * (255 / 2)).toInt()
+        this.omega = ((this.validateJoyConOutput(coordinateOmega, omegaScaler) + 1) * (255 / 2)).toInt()
     }
 
     private fun validateJoyConOutput(
