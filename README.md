@@ -1,7 +1,7 @@
 # NHK2024_R1_Smartphone_Controller
 
 ## UI
-
+![ui](./img/ui.jpeg)
 
 ## ソースコード
 `app/src/main/java/com/example/nhk2024_r1_smartphone_controller`の中身
@@ -15,3 +15,6 @@
 - スマホ：Samsung Galaxy A30
 - コントローラー： GAMESIRX2TYPEC
 - Android studio : 2021.3.1 Patch 1
+
+## 実行方法
+Android studioをインストールして、実機のスマホをパソコンに接続。書き込んだら使えるようになるよ。
