@@ -1,5 +1,7 @@
 package com.example.nhk2024_r1_smartphone_controller
 
+import android.os.Parcel
+import android.os.Parcelable
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,21 +20,23 @@ data class WheelObject(
     @SerialName("v_y") private var vy: Int,
     @SerialName("omega") private var omega: Int,
     @Transient private var isSpeedUp: Boolean,
-    @Transient private var xyScaler: Float = 0.5f,
-    @Transient private var omegaScaler: Float = 0.2f
+//    @Transient private var xyScaler: Float = 0.6f,
+//    @Transient private var omegaScaler: Float = 0.6f,
 ) {
     fun setRobotXYVelocity(
         coordinateX: Float,
         coordinateY: Float,
+        xyScaler: Float = 0.6f,
     ) {
-        this.vx = ((this.validateJoyConOutput(coordinateX, this.xyScaler) + 1) * (255 / 2)).toInt()
-        this.vy = ((this.validateJoyConOutput(-coordinateY, this.xyScaler) + 1) * (255 / 2)).toInt()
+        this.vx = ((this.validateJoyConOutput(coordinateX, xyScaler) + 1) * (255 / 2)).toInt()
+        this.vy = ((this.validateJoyConOutput(-coordinateY, xyScaler) + 1) * (255 / 2)).toInt()
     }
 
     fun setAngularVelocity(
         coordinateOmega: Float,
+        omegaScaler: Float = 0.6f,
     ) {
-        this.omega = ((this.validateJoyConOutput(coordinateOmega, this.omegaScaler) + 1) * (255 / 2)).toInt()
+        this.omega = ((this.validateJoyConOutput(coordinateOmega, omegaScaler) + 1) * (255 / 2)).toInt()
     }
 
     private fun validateJoyConOutput(
@@ -49,9 +53,9 @@ data class WheelObject(
         return if (-0.3 < value && value < 0.3) {
             0f
         } else if (value > 0) {
-            wheelScaler * (value - 0.3f)
+            wheelScaler * (value - 0.3f) / 0.7f
         } else {
-            wheelScaler * (value + 0.3f)
+            wheelScaler * (value + 0.3f) / 0.7f
         }
     }
 
@@ -66,11 +70,10 @@ data class ControllerObject(
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_b") private var btnB: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_x") private var btnX: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_y") private var btnY: Boolean,
-    // TODO: Check following properties
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_lb") private var btnL1: Boolean,
     @Serializable(with = BooleanAsIntSerializer::class) @SerialName("btn_rb") private var btnR1: Boolean,
     @Serializable(with = SeedlingHandPosSerializer::class) @SerialName("seedling_hand_pos") private var seedlingHandPos: SeedlingHandPos,
-    @Serializable(with = AreaStateSerializer::class) @SerialName("area_state") private var areaState: AreaState
+    @Serializable(with = AreaStateSerializer::class) @SerialName("area_state") private var areaState: AreaState,
 //    @SerialName("shoot_setpoint") private var shootSetpoint: Int,
 ) {
     fun setButtonA(
@@ -120,12 +123,10 @@ data class ControllerObject(
     ) {
         this.seedlingHandPos = pos
     }
-//
-//    fun setShootSetPoint(
-//        setpoint: Int
-//    ) {
-//        this.shootSetpoint = setpoint
-//    }
+
+    fun getSeedlingHandPos(): SeedlingHandPos {
+        return this.seedlingHandPos
+    }
 
     /*
         Control safe area function

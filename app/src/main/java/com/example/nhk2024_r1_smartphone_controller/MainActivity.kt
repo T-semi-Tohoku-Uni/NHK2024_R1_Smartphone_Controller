@@ -48,6 +48,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var shootSetPointValue: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecyclerAdapter
+    private lateinit var lastSeedlingHandPos: SeedlingHandPos
+
+    private lateinit var pickup: ImageButton
+    private lateinit var putInside: ImageButton
+    private lateinit var putOutside: ImageButton
 
     private lateinit var timerTextView: TextView
     private val handler = Handler(Looper.getMainLooper())
@@ -73,9 +78,10 @@ class MainActivity : AppCompatActivity() {
             btnL1 = false,
             btnR1 = false,
             seedlingHandPos = SeedlingHandPos.PICKUP,
-            areaState = AreaState.SEEDLING,
-//            shootSetpoint = 250,
+            areaState = AreaState.START,
         )
+
+        this.lastSeedlingHandPos = SeedlingHandPos.PICKUP
 
         this.wheelObject = WheelObject(
             vx = 127,
@@ -89,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("Hello", this.wheelObject.toString())
 
         // Set raspberrypi IP address
-        this.hostName = "192.168.11.4"
+        this.hostName = "192.168.0.40"
 
         // Set command Line
 
@@ -101,7 +107,6 @@ class MainActivity : AppCompatActivity() {
         val ballButton = findViewById<ImageButton>(R.id.ball)
 
         this.timerTextView = findViewById<TextView>(R.id.timer)
-        startTimer()
 
 //        seedlingButton.setOnClickListener {
 //            this.controllerObject.setAreaState(AreaState.SEEDLING)
@@ -114,6 +119,7 @@ class MainActivity : AppCompatActivity() {
                     seedlingButton.setImageResource(R.drawable.seedling_ball_pushed)
                     this.controllerObject.setAreaState(AreaState.SEEDLING)
                     this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                    this.pushArmPosButton(this.controllerObject.getSeedlingHandPos())
                     this.adapter.addItemToDebugConsole("set AreaStaete to SEEDLING")
                     this.adapter.addItemToDebugConsole(this.controllerObject.toString())
                 }
@@ -149,9 +155,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         // TODO: refactor
-        val pickup = findViewById<ImageButton>(R.id.pickup)
-        val putInside = findViewById<ImageButton>(R.id.put_inside)
-        val putOutside = findViewById<ImageButton>(R.id.put_outside)
+        pickup = findViewById<ImageButton>(R.id.pickup)
+        putInside = findViewById<ImageButton>(R.id.put_inside)
+        putOutside = findViewById<ImageButton>(R.id.put_outside)
 
 //        pickup.setOnClickListener {
 //            this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
@@ -162,17 +168,16 @@ class MainActivity : AppCompatActivity() {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
                     // TODO: add button
-                    handler.removeCallbacksAndMessages(null)
-                    startTimer()
-                    pickup.setImageResource(R.drawable.arm_pickup_pushed)
-                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
-                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PICKUP")
-                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+//                    this.resetArmPosButton()
+//                    pickup.setImageResource(R.drawable.arm_pickup_pushed)
+//                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+//                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PICKUP")
+//                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+                    this.pushArmPosButton(SeedlingHandPos.PICKUP)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // ボタンが離されたとき
-                    pickup.setImageResource(R.drawable.arm_pickup)
+
                 }
             }
             true
@@ -185,15 +190,16 @@ class MainActivity : AppCompatActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
-                    putInside.setImageResource(R.drawable.arm_inside_pushed)
-                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
-                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTINSIDE")
-                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+//                    this.resetArmPosButton()
+//                    putInside.setImageResource(R.drawable.arm_inside_pushed)
+//                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
+//                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTINSIDE")
+//                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+                    this.pushArmPosButton(SeedlingHandPos.PUTINSIDE)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // ボタンが離されたとき
-                    putInside.setImageResource(R.drawable.arm_inside)
+
                 }
             }
             true
@@ -206,15 +212,16 @@ class MainActivity : AppCompatActivity() {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     // ボタンが押されたとき
-                    putOutside.setImageResource(R.drawable.arm_outside_pushed)
-                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
-                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
-                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTOUTSIDE")
-                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+//                    this.resetArmPosButton()
+//                    putOutside.setImageResource(R.drawable.arm_outside_pushed)
+//                    this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
+//                    this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+//                    this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTOUTSIDE")
+//                    this.adapter.addItemToDebugConsole(this.controllerObject.toString())
+                    this.pushArmPosButton(SeedlingHandPos.PUTOUTSIDE)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // ボタンが離されたとき
-                    putOutside.setImageResource(R.drawable.arm_outside)
+
                 }
             }
             true
@@ -248,19 +255,18 @@ class MainActivity : AppCompatActivity() {
 
             if (dpadX != 0f) {
                 if (dpadX > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.6.toFloat(), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.5.toFloat(), 0.0.toFloat(), 0.3.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(-(0.6.toFloat()), 0.0.toFloat())
+                    this.wheelObject.setRobotXYVelocity(-(0.5.toFloat()), 0.0.toFloat(), 0.3.toFloat())
                 }
-//                this.wheelObject.setAngularVelocity(0.0.toFloat())
 
                 this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             } else if (dpadY != 0f) {
                 if (dpadY > 0) {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.6.toFloat())
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), 0.5.toFloat(), 0.5.toFloat())
                 } else {
-                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.6.toFloat()))
+                    this.wheelObject.setRobotXYVelocity(0.0.toFloat(), -(0.5.toFloat()), 0.5.toFloat())
                 }
 
 //                this.wheelObject.setAngularVelocity(0.0.toFloat())
@@ -281,6 +287,8 @@ class MainActivity : AppCompatActivity() {
 //            this.wheelObject.setAngularVelocity(axisZ)
 
             this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
+            this.adapter.addItemToDebugConsole("axisX: $axisX, axisY: $axisY, axisZ: $axisZ")
+
 
             return true
         }
@@ -296,37 +304,54 @@ class MainActivity : AppCompatActivity() {
             KeyEvent.KEYCODE_BUTTON_A -> {
                 this.controllerObject.setButtonA(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonA")
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_B -> {
                 this.controllerObject.setButtonB(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonB")
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_X -> {
                 this.controllerObject.setButtonX(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonX")
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_Y -> {
                 this.controllerObject.setButtonY(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonY")
                 return true
             }
             KeyEvent.KEYCODE_BUTTON_L1 -> {
                 this.controllerObject.setButtonL1(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonL1")
                 return true
+            }
+            KeyEvent.KEYCODE_BUTTON_L2 -> {
+                this.resetArmPosButton()
+                if (this.controllerObject.getSeedlingHandPos() == SeedlingHandPos.PICKUP) {
+                    pushArmPosButton(SeedlingHandPos.PUTINSIDE)
+                } else if (this.controllerObject.getSeedlingHandPos() == SeedlingHandPos.PUTINSIDE) {
+                    pushArmPosButton(SeedlingHandPos.PUTOUTSIDE)
+                } else if (this.controllerObject.getSeedlingHandPos() == SeedlingHandPos.PUTOUTSIDE) {
+                    pushArmPosButton(SeedlingHandPos.PICKUP)
+                }
             }
             KeyEvent.KEYCODE_BUTTON_R1 -> {
                 this.controllerObject.setButtonR1(true)
                 this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("buttonR1")
                 return true
             }
 
             KeyEvent.KEYCODE_BUTTON_R2 -> { // For speed up
                 this.wheelObject.setIsSpeedUP(true)
                 this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
+                this.adapter.addItemToDebugConsole("buttonR2")
                 return true
             }
 
@@ -356,8 +381,31 @@ class MainActivity : AppCompatActivity() {
 //                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
-        }
 
+            // ホームボタン
+            KeyEvent.KEYCODE_BUTTON_MODE -> {
+                // 現在の状態を保管
+                this.lastSeedlingHandPos = this.controllerObject.getSeedlingHandPos()
+                this.controllerObject.setSeedlingHandPos(SeedlingHandPos.RESET)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("reset state")
+                return true
+            }
+
+            // Gボタン
+            KeyEvent.KEYCODE_BUTTON_SELECT -> {
+                this.controllerObject.setAreaState(AreaState.START)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("set start state")
+                return true
+            }
+
+            KeyEvent.KEYCODE_BUTTON_START -> {
+                handler.removeCallbacksAndMessages(null)
+                startTimer()
+                return true
+            }
+        }
         return true
     }
 
@@ -423,8 +471,18 @@ class MainActivity : AppCompatActivity() {
 //                this.raspiRepository.sendWheelDataToRaspi(this.wheelObject)
                 return true
             }
+
+            // ホームボタン
+            KeyEvent.KEYCODE_BUTTON_MODE -> {
+                // 元の位置の情報に戻す
+                this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+                this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+                this.adapter.addItemToDebugConsole("restore")
+                return true
+            }
         }
 
+        this.adapter.addItemToDebugConsole(keyCode.toString())
         return true
     }
 
@@ -443,6 +501,37 @@ class MainActivity : AppCompatActivity() {
                 handler.postDelayed(this, 1000)
             }
         })
+    }
+
+    private fun resetArmPosButton() {
+        pickup.setImageResource(R.drawable.arm_pickup)
+        putInside.setImageResource(R.drawable.arm_inside)
+        putOutside.setImageResource(R.drawable.arm_outside)
+    }
+
+    private fun pushArmPosButton(pos: SeedlingHandPos) {
+        this.resetArmPosButton()
+
+        when (pos) {
+            SeedlingHandPos.PICKUP -> {
+                pickup.setImageResource(R.drawable.arm_pickup_pushed)
+                this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PICKUP)
+            }
+            SeedlingHandPos.PUTINSIDE -> {
+                this.putInside.setImageResource(R.drawable.arm_inside_pushed)
+                this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTINSIDE)
+            }
+            SeedlingHandPos.PUTOUTSIDE -> {
+                this.putOutside.setImageResource(R.drawable.arm_outside_pushed)
+                this.controllerObject.setSeedlingHandPos(SeedlingHandPos.PUTOUTSIDE)
+            }
+            SeedlingHandPos.RESET -> {
+
+            }
+        }
+        this.raspiRepository.addToRaspiUDPQueue(this.controllerObject)
+        this.adapter.addItemToDebugConsole("set SEEDLING HAND POS to PUTOUTSIDE")
+        this.adapter.addItemToDebugConsole(this.controllerObject.toString())
     }
 
     // For display command output

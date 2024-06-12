@@ -9,7 +9,8 @@ import kotlinx.serialization.encoding.Encoder
 
 enum class AreaState {
     SEEDLING, // => 0
-    BALL; // => 1
+    BALL,     // => 1
+    START;    // => 2
 
     companion object {
         fun fromOrdinal(ordinal: Int): AreaState = values().getOrElse(ordinal) {AreaState.SEEDLING}
